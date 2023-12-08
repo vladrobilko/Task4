@@ -1,0 +1,93 @@
+﻿@model List<Task4.Models.User>
+
+@section HeaderInfo {
+    <div class="ml-auto">
+        <h2 class="d-inline">Welcome, @User.Identity.Name!</h2>
+        <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-danger ml-2">Logout</a>
+    </div>
+}
+
+<div class="container mt-5">
+    <form asp-controller="UserManagement" asp-action="HandleUserManageActions" method="post">
+
+        <div class="row mt-3">
+            <div class="col-md-12">
+                <button type="submit" name="action" value="block" class="btn btn-warning">Block</button>
+                <button type="submit" name="action" value="unblock" class="btn btn-success">Unblock</button>
+                <button type="submit" name="action" value="delete" class="btn btn-danger">Delete</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th><input type="checkbox" id="selectAll"/></th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Date of Registration</th>
+                    <th>Last Login Date</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td><input type="checkbox" name="selectedUserEmails" class="userCheckbox" data-user-email="@user.Email" /></td>
+                        <td>@user.Name</td>
+                        <td>@user.Email</td>
+                        <td>@user.RegistrationDate</td>
+                        <td>@user.LastLoginDate</td>
+                        <td>@(user.IsBlocked ? "Blocked" : "Active")</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js" asp-append-version="true"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+<script>
+    $(document).ready(function () {
+        $('#selectAll').change(function () {
+            var isChecked = $(this).prop('checked');
+            $('.userCheckbox').prop('checked', isChecked);
+        });
+
+        $('form').submit(function (event) {
+            event.preventDefault();
+
+            var action = $('button[name="action"]:focus').val();
+
+            var formData = new FormData();
+
+            $('.userCheckbox:checked').each(function () {
+                formData.append('selectedUserEmails', $(this).data('user-email'));
+            });
+            
+            var userEmail = '@User.Identity.Name';
+            formData.append('userEmail', userEmail);
+
+            formData.append('action', action);
+
+            $.ajax({
+                url: '@Url.Action("HandleUserManageActions", "UserManagement")',
+                type: 'POST',
+                processData: false,
+                contentType: false,
+                data: formData,
+                success: function (data) {
+                    location.reload();
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr.responseText);
+                }
+            });
+        });
+    });
+</script>
