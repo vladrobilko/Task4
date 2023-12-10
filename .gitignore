@@ -362,3 +362,9 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /appsettings.json
+
+# Ignore Entity Framework migration files
+**/Migrations/*
+**/Migrations/*.cs
+**/Migrations/*.resx
+/Migrations/ApplicationDbContextModelSnapshot.cs
