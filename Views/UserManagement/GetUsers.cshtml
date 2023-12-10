@@ -85,7 +85,10 @@
                     location.reload();
                 },
                 error: function (xhr, status, error) {
-                    console.error(xhr.responseText);
+                    console.error("XHR Status: " + xhr.status);
+                    console.error("XHR Status Text: " + xhr.statusText);
+                    console.error("Response Text: " + xhr.responseText);
+                    console.error("Error Message: " + error);
                 }
             });
         });
