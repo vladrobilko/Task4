@@ -374,3 +374,4 @@ FodyWeavers.xsd
 **/Properties
 /Migrations/20231207105559_InitialMigration.cs
 /Migrations/20231207143708_SecondMigration.cs
+/Properties/launchSettings.json

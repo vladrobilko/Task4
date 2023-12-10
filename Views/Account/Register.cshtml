@@ -1,27 +1,36 @@
 ﻿@model Task4.Models.RegisterUserViewModel
+
 @{
     ViewData["Title"] = "Register";
 }
 
 <div class="container">
+    
+    @if (Model != null && !string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            @Model.ErrorMessage
+        </div>
+    }
+
     <h2>Register</h2>
 
     <form method="post" asp-action="Register">
         <div class="form-group">
             <label asp-for="Name">Name:</label>
-            <input asp-for="Name" class="form-control" />
+            <input asp-for="Name" class="form-control"/>
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
 
         <div class="form-group">
             <label asp-for="Email">Email:</label>
-            <input asp-for="Email" class="form-control" />
+            <input asp-for="Email" class="form-control"/>
             <span asp-validation-for="Email" class="text-danger"></span>
         </div>
 
         <div class="form-group">
             <label asp-for="Password">Password:</label>
-            <input asp-for="Password" type="password" class="form-control" />
+            <input asp-for="Password" type="password" class="form-control"/>
             <span asp-validation-for="Password" class="text-danger"></span>
         </div>
 

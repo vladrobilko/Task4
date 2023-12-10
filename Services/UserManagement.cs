@@ -13,8 +13,7 @@ public class UserManagement : IUserManagement
     public UserManagement(UserManager<User> userManager) => _userManager = userManager;
 
     public async Task<List<User>> GetUsersAsync() => await _userManager.Users.ToListAsync();
-
-
+    
     public async Task HandleUserManageActionsAsync(UserManageActions action, List<string> emails)
     {
         if (action == UserManageActions.Delete)

@@ -16,9 +16,9 @@ namespace Task4.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterUserViewModel registerModel)
         {
-            if (await _accountService.RegisterAsync(registerModel))
+            if (ModelState.IsValid && await _accountService.RegisterAsync(registerModel))
                 return RedirectToAction("GetUsers", "UserManagement", new { userEmail = registerModel.Email });
-            return RedirectToAction("Register");
+            return View("Register", registerModel);
         }
 
         [HttpGet]
@@ -27,9 +27,9 @@ namespace Task4.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginUserViewModel loginModel)
         {
-            if (await _accountService.LoginAsync(loginModel))
+            if (ModelState.IsValid && await _accountService.LoginAsync(loginModel))
                 return RedirectToAction("GetUsers", "UserManagement", new { userEmail = loginModel.Email });
-            return RedirectToAction("Login");
+            return View("Login", loginModel);
         }
 
         public async Task<IActionResult> Logout()

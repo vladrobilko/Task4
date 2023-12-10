@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.ComponentModel.DataAnnotations;
 
 namespace Task4.Models
 {
@@ -9,5 +10,8 @@ namespace Task4.Models
 
         [Required(ErrorMessage = "Please enter a password.")]
         public string Password { get; set; }
+
+        [BindNever]
+        public string? ErrorMessage { get; set; }
     }
 }

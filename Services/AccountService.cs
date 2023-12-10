@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Task4.Helpers;
 using Task4.Models;
 using Task4.Services.Interfaces;
 
@@ -19,21 +21,34 @@ namespace Task4.Services
 
         public async Task<bool> RegisterAsync(RegisterUserViewModel registerModel)
         {
-            if (!IsRegisterModelValid(registerModel)) return false;
-            var user = CreateUser(registerModel);
-            var result = await _userManager.CreateAsync(user, registerModel.Password);
-            if (result.Succeeded) await _signInManager.SignInAsync(user, isPersistent: false);
+            var result = await CreateAndSignInUserAsync(registerModel, CreateUser(registerModel));
             return result.Succeeded;
         }
 
         public async Task<bool> LoginAsync(LoginUserViewModel loginModel)
         {
-            if (!IsLoginModelValid(loginModel)) return false;
             var user = await _userManager.FindByEmailAsync(loginModel.Email);
-            if (user?.IsBlocked == true) return false;
-            if (user?.IsBlocked == false && (await _signInManager.PasswordSignInAsync(user, loginModel.Password, false, false)).Succeeded)
-                await UpdateUserAsync(user);
-            return user?.IsBlocked == false;
+            if (user == null)
+            {
+                loginModel.SetErrorMessage(null, user);
+                return false;
+            }
+            var signInResult = await _signInManager.PasswordSignInAsync(user, loginModel.Password, false, false);
+            if (!user.IsBlocked && signInResult.Succeeded) await UpdateUserAsync(user);
+            else loginModel.SetErrorMessage(signInResult, user);
+            return user?.IsBlocked == false && signInResult.Succeeded;
+        }
+
+        public async Task LogoutAsync() => await _signInManager.SignOutAsync();
+
+        private async Task<IdentityResult> CreateAndSignInUserAsync(RegisterUserViewModel registerModel, User user)
+        {
+            var result = await _userManager.CreateAsync(user, registerModel.Password);
+            if (result.Succeeded)
+                await _signInManager.SignInAsync(user, isPersistent: false);
+            else
+                registerModel.ErrorMessage = string.Join(", ", result.Errors.Select(e => e.Description));
+            return result;
         }
 
         private async Task UpdateUserAsync(User user)
@@ -41,8 +56,6 @@ namespace Task4.Services
             user.LastLoginDate = DateTime.Now;
             await _userManager.UpdateAsync(user);
         }
-
-        public async Task LogoutAsync() => await _signInManager.SignOutAsync();
 
         private User CreateUser(RegisterUserViewModel registerModel) =>
             new User
@@ -55,14 +68,5 @@ namespace Task4.Services
                 LastLoginDate = DateTime.Now,
                 IsBlocked = false
             };
-
-        private bool IsRegisterModelValid(RegisterUserViewModel registerModel) =>
-            !string.IsNullOrEmpty(registerModel.Email) &&
-            !string.IsNullOrEmpty(registerModel.Name) &&
-            !string.IsNullOrEmpty(registerModel.Password);
-
-        private bool IsLoginModelValid(LoginUserViewModel loginModel) =>
-             !string.IsNullOrEmpty(loginModel.Email) &&
-             !string.IsNullOrEmpty(loginModel.Password);
     }
 }
