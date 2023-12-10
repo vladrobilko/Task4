@@ -9,27 +9,22 @@ namespace Task4.Controllers
     {
         private readonly IUserManagement _userManagement;
 
-        public UserManagementController(IUserManagement userManagement)
-        {
-            _userManagement = userManagement;
-        }
-
+        public UserManagementController(IUserManagement userManagement) => _userManagement = userManagement;
+        
         [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetUsers(string? userEmail)
         {
-            if (await _userManagement.IsUserBlocked(userEmail))
+            if (await _userManagement.IsUserBlockedOrNotExistAsync(userEmail))
                 return RedirectToAction("Login", "Account");
-
-            return View(await _userManagement.GetUsers());
+            return View(await _userManagement.GetUsersAsync());
         }
 
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> HandleUserManageActions(string action, List<string> selectedUserEmails, string userEmail)
         {
-            await _userManagement.HandleUserManageActions(action.ToUserManageActions(), selectedUserEmails);
-
+            await _userManagement.HandleUserManageActionsAsync(action.ToUserManageActions(), selectedUserEmails);
             return RedirectToAction("GetUsers", new { userEmail = userEmail });
         }
     }

@@ -8,46 +8,33 @@ namespace Task4.Controllers
     {
         private readonly IAccountService _accountService;
 
-        public AccountController(IAccountService accountService)
-        {
-            _accountService = accountService;
-        }
+        public AccountController(IAccountService accountService) => _accountService = accountService;
 
         [HttpGet]
-        public IActionResult Register()
-        {
-            return View();
-        }
+        public IActionResult Register() => View();
 
         [HttpPost]
         public async Task<IActionResult> Register(RegisterUserViewModel registerModel)
         {
-            if (await _accountService.Register(registerModel))
+            if (await _accountService.RegisterAsync(registerModel))
                 return RedirectToAction("GetUsers", "UserManagement", new { userEmail = registerModel.Email });
-
             return RedirectToAction("Register");
         }
 
         [HttpGet]
-        public IActionResult Login()
-        {
-            return View();
-        }
-
+        public IActionResult Login() => View();
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginUserViewModel loginModel)
         {
-            if (await _accountService.Login(loginModel))
+            if (await _accountService.LoginAsync(loginModel))
                 return RedirectToAction("GetUsers", "UserManagement", new { userEmail = loginModel.Email });
-
             return RedirectToAction("Login");
         }
 
         public async Task<IActionResult> Logout()
         {
-            await _accountService.Logout();
-
+            await _accountService.LogoutAsync();
             return RedirectToAction("Login");
         }
     }

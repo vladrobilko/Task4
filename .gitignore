@@ -372,3 +372,5 @@ FodyWeavers.xsd
 # Ignore files and folder in the 'Properties' folder
 **/Properties/*
 **/Properties
+/Migrations/20231207105559_InitialMigration.cs
+/Migrations/20231207143708_SecondMigration.cs

@@ -4,19 +4,13 @@ namespace Task4.Converters
 {
     public static class StringConverter
     {
-        public static UserManageActions ToUserManageActions(this string action)
-        {
-            switch (action)
+        public static UserManageActions ToUserManageActions(this string action) =>
+            action switch
             {
-                case "block":
-                    return UserManageActions.Block;
-                case "unblock":
-                    return UserManageActions.Unblock;
-                case "delete":
-                    return UserManageActions.Delete;
-                default:
-                    throw new ArgumentException();
-            }
-        }
+                "block" => UserManageActions.Block,
+                "unblock" => UserManageActions.Unblock,
+                "delete" => UserManageActions.Delete,
+                _ => throw new ArgumentException()
+            };
     }
 }

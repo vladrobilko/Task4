@@ -5,9 +5,9 @@ namespace Task4.Services.Interfaces;
 
 public interface IUserManagement
 {
-    Task<List<User>> GetUsers();
+    Task<List<User>> GetUsersAsync();
 
-    Task HandleUserManageActions(UserManageActions action, List<string> emails);
+    Task HandleUserManageActionsAsync(UserManageActions action, List<string> emails);
 
-    Task<bool> IsUserBlocked(string? email);
+    Task<bool> IsUserBlockedOrNotExistAsync(string? email);
 }

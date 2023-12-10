@@ -17,54 +17,35 @@ namespace Task4.Services
 
         }
 
-        public async Task<bool> Register(RegisterUserViewModel registerModel)
+        public async Task<bool> RegisterAsync(RegisterUserViewModel registerModel)
         {
             if (!IsRegisterModelValid(registerModel)) return false;
-
             var user = CreateUser(registerModel);
-
             var result = await _userManager.CreateAsync(user, registerModel.Password);
-
-            if (result.Succeeded)
-            {
-                await _signInManager.SignInAsync(user, isPersistent: false);
-
-                return true;
-            }
-
-            return false;
+            if (result.Succeeded) await _signInManager.SignInAsync(user, isPersistent: false);
+            return result.Succeeded;
         }
 
-        public async Task<bool> Login(LoginUserViewModel loginModel)
+        public async Task<bool> LoginAsync(LoginUserViewModel loginModel)
         {
             if (!IsLoginModelValid(loginModel)) return false;
-
             var user = await _userManager.FindByEmailAsync(loginModel.Email);
-
-            if (user == null || user.IsBlocked) return false;
-
-            var result = await _signInManager.PasswordSignInAsync(user, loginModel.Password,
-                isPersistent: false, lockoutOnFailure: false);
-
-            if (result.Succeeded)
-            {
-                user.LastLoginDate = DateTime.Now;
-                await _userManager.UpdateAsync(user);
-
-                return true;
-            }
-
-            return false;
+            if (user?.IsBlocked == true) return false;
+            if (user?.IsBlocked == false && (await _signInManager.PasswordSignInAsync(user, loginModel.Password, false, false)).Succeeded)
+                await UpdateUserAsync(user);
+            return user?.IsBlocked == false;
         }
 
-        public async Task Logout()
+        private async Task UpdateUserAsync(User user)
         {
-            await _signInManager.SignOutAsync();
+            user.LastLoginDate = DateTime.Now;
+            await _userManager.UpdateAsync(user);
         }
 
-        private static User CreateUser(RegisterUserViewModel registerModel)
-        {
-            return new User()
+        public async Task LogoutAsync() => await _signInManager.SignOutAsync();
+
+        private User CreateUser(RegisterUserViewModel registerModel) =>
+            new User
             {
                 Id = Guid.NewGuid().ToString(),
                 UserName = registerModel.Email,
@@ -74,19 +55,14 @@ namespace Task4.Services
                 LastLoginDate = DateTime.Now,
                 IsBlocked = false
             };
-        }
 
-        private bool IsRegisterModelValid(RegisterUserViewModel registerModel)
-        {
-            return !string.IsNullOrEmpty(registerModel.Email)
-                   && !string.IsNullOrEmpty(registerModel.Name)
-                   && !string.IsNullOrEmpty(registerModel.Password);
-        }
+        private bool IsRegisterModelValid(RegisterUserViewModel registerModel) =>
+            !string.IsNullOrEmpty(registerModel.Email) &&
+            !string.IsNullOrEmpty(registerModel.Name) &&
+            !string.IsNullOrEmpty(registerModel.Password);
 
-        private bool IsLoginModelValid(LoginUserViewModel loginModel)
-        {
-            return !string.IsNullOrEmpty(loginModel.Email)
-                   && !string.IsNullOrEmpty(loginModel.Password);
-        }
+        private bool IsLoginModelValid(LoginUserViewModel loginModel) =>
+             !string.IsNullOrEmpty(loginModel.Email) &&
+             !string.IsNullOrEmpty(loginModel.Password);
     }
 }

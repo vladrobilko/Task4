@@ -4,10 +4,10 @@ namespace Task4.Services.Interfaces
 {
     public interface IAccountService
     {
-        Task<bool> Register(RegisterUserViewModel registerModel);
+        Task<bool> RegisterAsync(RegisterUserViewModel registerModel);
 
-        Task<bool> Login(LoginUserViewModel loginModel);
+        Task<bool> LoginAsync(LoginUserViewModel loginModel);
 
-        Task Logout();
+        Task LogoutAsync();
     }
 }

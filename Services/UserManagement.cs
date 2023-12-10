@@ -10,63 +10,35 @@ public class UserManagement : IUserManagement
 {
     private readonly UserManager<User> _userManager;
 
-    public UserManagement(UserManager<User> userManager)
-    {
-        _userManager = userManager;
-    }
+    public UserManagement(UserManager<User> userManager) => _userManager = userManager;
 
-    public async Task<List<User>> GetUsers()
-    {
-        return await _userManager.Users.ToListAsync();
-    }
+    public async Task<List<User>> GetUsersAsync() => await _userManager.Users.ToListAsync();
 
-    public async Task HandleUserManageActions(UserManageActions action, List<string> emails)
+
+    public async Task HandleUserManageActionsAsync(UserManageActions action, List<string> emails)
     {
         if (action == UserManageActions.Delete)
             await DeleteUsers(emails);
-
         if (action == UserManageActions.Block)
-            await BlockUsers(emails);
-
+            await ProcessUsersAsync(emails, true);
         if (action == UserManageActions.Unblock)
-            await UnblockUsers(emails);
+            await ProcessUsersAsync(emails, false);
     }
 
-    public async Task<bool> IsUserBlocked(string? email)
+    public async Task<bool> IsUserBlockedOrNotExistAsync(string? email)
     {
         var user = await _userManager.FindByEmailAsync(email);
-
-        if (user != null && user.IsBlocked)
-            return true;
-
-        return false;
+        return user == null || user.IsBlocked;
     }
 
-    private async Task UnblockUsers(List<string> emails)
+    private async Task ProcessUsersAsync(List<string> emails, bool isBlocked)
     {
         foreach (var email in emails)
         {
             var user = await _userManager.FindByEmailAsync(email);
-
             if (user != null)
             {
-                user.IsBlocked = false;
-
-                await _userManager.UpdateAsync(user);
-            }
-        }
-    }
-
-    private async Task BlockUsers(List<string> emails)
-    {
-        foreach (var email in emails)
-        {
-            var user = await _userManager.FindByEmailAsync(email);
-
-            if (user != null)
-            {
-                user.IsBlocked = true;
-
+                user.IsBlocked = isBlocked;
                 await _userManager.UpdateAsync(user);
             }
         }
@@ -77,7 +49,6 @@ public class UserManagement : IUserManagement
         foreach (var email in emails)
         {
             var user = await _userManager.FindByEmailAsync(email);
-
             if (user != null)
                 await _userManager.DeleteAsync(user);
         }
