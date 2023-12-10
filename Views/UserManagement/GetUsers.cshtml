@@ -39,8 +39,8 @@
                         <td><input type="checkbox" name="selectedUserEmails" class="userCheckbox" data-user-email="@user.Email" /></td>
                         <td>@user.Name</td>
                         <td>@user.Email</td>
-                        <td>@user.RegistrationDate</td>
-                        <td>@user.LastLoginDate</td>
+                        <td>@(user.RegistrationDate.AddHours(4).ToString("yyyy-MM-dd HH:mm:ss"))</td>
+                        <td>@(user.LastLoginDate.AddHours(4).ToString("yyyy-MM-dd HH:mm:ss"))</td>
                         <td>@(user.IsBlocked ? "Blocked" : "Active")</td>
                     </tr>
                 }

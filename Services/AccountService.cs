@@ -53,7 +53,7 @@ namespace Task4.Services
 
         private async Task UpdateUserAsync(User user)
         {
-            user.LastLoginDate = DateTime.Now;
+            user.LastLoginDate = DateTime.UtcNow;
             await _userManager.UpdateAsync(user);
         }
 
@@ -64,8 +64,8 @@ namespace Task4.Services
                 UserName = registerModel.Email,
                 Name = registerModel.Name,
                 Email = registerModel.Email,
-                RegistrationDate = DateTime.Now,
-                LastLoginDate = DateTime.Now,
+                RegistrationDate = DateTime.UtcNow,
+                LastLoginDate = DateTime.UtcNow,
                 IsBlocked = false
             };
     }
